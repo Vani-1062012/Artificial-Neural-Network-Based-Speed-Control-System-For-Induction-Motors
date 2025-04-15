@@ -1,0 +1,357 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>ANN Control System</title>
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600&display=swap" rel="stylesheet"/>
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    body, html {
+      height: 100%;
+      width: 100%;
+      font-family: 'Poppins', sans-serif;
+      background-color: #f4f7fa;
+    }
+
+    .container {
+      display: flex;
+      height: 100vh;
+      background: linear-gradient(to right, #1a202c, #2d3748);
+      color: white;
+    }
+
+    .left {
+      flex: 1;
+      background: linear-gradient(135deg, #3b82f6, #1e3a8a);
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      align-items: center;
+      padding: 40px;
+    }
+
+    .left h1 {
+      font-size: 50px;
+      margin-bottom: 20px;
+      text-shadow: 2px 2px 4px rgba(0,0,0,0.4);
+    }
+
+    .left p {
+      font-size: 18px;
+      text-align: center;
+      max-width: 400px;
+      line-height: 1.6;
+    }
+
+    .right {
+      flex: 1;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+    }
+
+    .login-card {
+      background: #1e3a8a;
+      padding: 40px;
+      border-radius: 15px;
+      box-shadow: 0 8px 30px rgba(0,0,0,0.2);
+      width: 320px;
+    }
+
+    .login-card h2 {
+      margin-bottom: 20px;
+      text-align: center;
+      font-weight: 600;
+    }
+
+    .login-card input,
+    .login-card button {
+      width: 100%;
+      padding: 12px;
+      margin: 10px 0;
+      border-radius: 8px;
+      font-size: 14px;
+    }
+
+    .login-card input {
+      border: 1px solid #ccc;
+    }
+
+    .login-card input:focus {
+      border-color: #3b82f6;
+      outline: none;
+    }
+
+    .login-card button {
+      background-color: #3b82f6;
+      color: white;
+      font-weight: 600;
+      border: none;
+      cursor: pointer;
+    }
+
+    .login-card button:hover {
+      background-color: #2563eb;
+    }
+
+    .password-toggle {
+      position: absolute;
+      margin-left: -30px;
+      margin-top: 18px;
+      cursor: pointer;
+    }
+
+    .error-message {
+      margin-top: 10px;
+      color: red;
+      text-align: center;
+      display: none;
+    }
+
+    .loader {
+      border: 4px solid #f3f3f3;
+      border-top: 4px solid #3b82f6;
+      border-radius: 50%;
+      width: 24px;
+      height: 24px;
+      animation: spin 1s linear infinite;
+      margin: 10px auto;
+      display: none;
+    }
+
+    @keyframes spin {
+      0% { transform: rotate(0deg); }
+      100% { transform: rotate(360deg); }
+    }
+
+    #next-page {
+      display: none;
+      flex-direction: column;
+      align-items: center;
+      padding: 40px;
+      background-color: #eff6ff;
+      min-height: 100vh;
+    }
+
+    h1 {
+      font-size: 36px;
+      color: #1e3a8a;
+      margin-bottom: 30px;
+    }
+
+    .subheadings {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 20px;
+      justify-content: center;
+    }
+
+    .subheading-box {
+      background: #3b82f6;
+      color: white;
+      padding: 20px;
+      border-radius: 12px;
+      width: 240px;
+      text-align: center;
+      font-size: 16px;
+      cursor: pointer;
+      box-shadow: 0 4px 10px rgba(0,0,0,0.1);
+      transition: transform 0.2s, background 0.2s;
+    }
+
+    .subheading-box:hover {
+      transform: translateY(-5px);
+      background: #1e40af;
+    }
+
+    .content {
+      display: none;
+      padding: 30px;
+      background-color: #ffffff;
+      max-width: 900px;
+      margin: 30px auto;
+      border-radius: 12px;
+      box-shadow: 0 6px 20px rgba(0,0,0,0.1);
+      border-left: 8px solid #3b82f6;
+    }
+
+    .content h2 {
+      font-size: 28px;
+      margin-bottom: 20px;
+      color: #1e3a8a;
+    }
+
+    .content p,
+    .content ul {
+      font-size: 16px;
+      color: #1f2937;
+      line-height: 1.8;
+    }
+
+    .content ul {
+      list-style-type: disc;
+      padding-left: 20px;
+    }
+
+    .content button {
+      margin-top: 20px;
+      background-color: #3b82f6;
+      color: white;
+      border: none;
+      padding: 10px 20px;
+      border-radius: 8px;
+      cursor: pointer;
+    }
+
+    .content button:hover {
+      background-color: #2563eb;
+    }
+  </style>
+</head>
+<body>
+
+<!-- Login Page -->
+<div class="container" id="login-page">
+  <div class="left">
+    <h1>Welcome!</h1>
+    <p>ANN-Based Motor Control System. Login to access the dashboard.</p>
+  </div>
+  <div class="right">
+    <div class="login-card">
+      <h2>Admin Login</h2>
+      <input type="email" id="email" placeholder="Email" />
+      <div style="position: relative;">
+        <input type="password" id="password" placeholder="Password" />
+        <span class="password-toggle" onclick="togglePassword()">👁️</span>
+      </div>
+      <button onclick="handleLogin()">Login</button>
+      <div class="loader" id="loader"></div>
+      <div class="error-message" id="error-message">Invalid Email or Password!</div>
+    </div>
+  </div>
+</div>
+
+<!-- Dashboard Page -->
+<div id="next-page">
+  <h1>ANN Control System Dashboard</h1>
+  <div class="subheadings">
+    <div class="subheading-box" onclick="showContent('Introduction')">Introduction</div>
+    <div class="subheading-box" onclick="showContent('Workflow')">Workflow</div>
+    <div class="subheading-box" onclick="showContent('Objectives')">Objectives</div>
+    <div class="subheading-box" onclick="showContent('Methodology')">Methodology</div>
+    <div class="subheading-box" onclick="showContent('MATLAB Simulink Model')">MATLAB Simulink Model</div>
+    <div class="subheading-box" onclick="showContent('V/F Control')">V/F Control</div>
+    <div class="subheading-box" onclick="showContent('ANN Integration')">ANN Integration</div>
+    <div class="subheading-box" onclick="showContent('Results')">Results</div>
+    <div class="subheading-box" onclick="showContent('UI Design')">UI Design</div>
+    <div class="subheading-box" onclick="showContent('Conclusion')">Conclusion</div>
+    <div class="subheading-box" onclick="showContent('References')">References</div>
+  </div>
+</div>
+
+<!-- Content Page -->
+<div class="content" id="content">
+  <h2 id="content-heading"></h2>
+  <div id="content-description"></div>
+  <button onclick="goBack()">Back</button>
+</div>
+
+<script>
+  const mockUser = { email: "srimakannan24@gmail.com", password: "uieee123" };
+
+  function handleLogin() {
+    const email = document.getElementById('email').value.trim();
+    const password = document.getElementById('password').value.trim();
+    const loader = document.getElementById('loader');
+    const errorMessage = document.getElementById('error-message');
+
+    loader.style.display = "block";
+    errorMessage.style.display = "none";
+
+    setTimeout(() => {
+      loader.style.display = "none";
+
+      if (email === mockUser.email && password === mockUser.password) {
+        document.getElementById('login-page').style.display = 'none';
+        document.getElementById('next-page').style.display = 'flex';
+      } else {
+        errorMessage.style.display = "block";
+      }
+    }, 1500);
+  }
+
+  function togglePassword() {
+    const password = document.getElementById('password');
+    password.type = password.type === "password" ? "text" : "password";
+  }
+
+  function showContent(title) {
+    const contentMap = {
+      'Introduction': [
+        "3-phase induction motors are widely used in industrial and commercial applications.",
+        "They are known for their robustness, reliability, and low maintenance requirements.",
+        "Operate based on Faraday’s law of electromagnetic induction.",
+        "Speed control is essential for improving efficiency, performance, and energy savings.",
+        "Induction motors are inherently coupled systems, making speed control a challenging task.",
+        "Various control techniques exist: Scalar control (V/F), Fuzzy Logic, FOC etc.",
+        "V/F (Volts-per-Hertz) method is simple, cost-effective, and suitable for most practical applications.",
+        "In this project, a closed-loop V/F control with a PI controller is used for accurate speed regulation.",
+        "Implementation is done using MATLAB/Simulink, demonstrating stable speed and torque performance.",
+      ],
+      'Workflow': `1. V/F Control → 2. PI Controller → 3. Reference Speed → 4. Voltage and Frequency → 5. 3-Phase Induction Motor`,
+      'Objectives': `<ul><li>To control the speed of a 3-phase induction motor using the Volts-per-Hertz (V/F) method)</li>  → Adjust voltage and frequency proportionally to maintain constant magnetic flux.<br><li>To implement a closed-loop control system with a PI controller</li> → Feedback system using a Proportional-Integral (PI) controller to minimize speed error.<br><li>To simulate and analyze the motor performance using MATLAB/Simulink</li> → Use simulation tools to build, test, and observe system behavior.<br><li>To demonstrate stable speed and torque under varying loads</li> → Ensure the motor maintains desired performance even when the load changes.<br><li>To provide a cost-effective and simpler alternative to complex control methods</li> → Highlight the ease and efficiency of V/F compared to advanced methods like vector control.<br><li>To compare system performance with theoretical expectations</li> → Validate simulation results against predicted behavior.</ul>`,
+
+      'Methodology': `Step 1: Design and Implementation of V/F Control in Simulink: \n - A closed-loop V/F control system is built using MATLAB/Simulink. The model includes:
+<ul><li>Reference speed input</li><li>Speed feedback loop</li><li>PI controller to minimize speed error</li><li>V/F logic block to generate frequency and voltage</li><li>PWM inverter for three-phase voltage supply</li><li>3-phase induction motor block</li><li>This base model is used to simulate various operating conditions.</li></ul>
+ \n Step 2: Dataset Generation for ANN Training\n <ul><li>The system is simulated under varying reference speeds.</li><li>Key input and output variables are recorded:</li><li>Inputs to ANN:<ul typr="button"></li><li>speed error</li><li>Targets (outputs): Control signal.</li></ul><li>The recorded data is saved as a training dataset for the neural network.</li></ul>\n Step 3: Training the Artificial Neural Network (ANN) \n<ul><li>A Feedforward Neural Network is created using the MATLAB Neural Network Toolbox.</li><li>The dataset is split into training, validation, and testing sets.</li><li>Training is done using the backpropagation algorithm to minimize mean square error.</li><li>After training, performance is evaluated</li><li>Once trained successfully, the network is exported as a Simulink-compatible function block.</li></ul>\n Step 4: Integrating ANN into Simulink Model \n<ul><li>The trained ANN block is added to the original Simulink model.</li><li>ANN replaces or supports the PI controller to generate control signals .</li><li>The updated model is run under the same conditions to analyze performance improvements.</li></ul>\n Step 5: Performance Analysis and Comparison\n <ul><li>System performance is compared before and after ANN integration.</li><li>Evaluation parameters include:</li><ul type="button"><li>Speed tracking accuracy</li><li>Response time</li><li>Torque smoothness</li><li>Stability under load variations</li></ul></ul>`,
+
+      'MATLAB Simulink Model': `A model built in Simulink representing a 3-phase induction motor with V/F control, load torque, and feedback mechanisms.<!-- Simulink Model Section -->
+<p><strong>MATLAB Simulink Model</strong>: A model built in Simulink representing a 3-phase induction motor with V/F control, load torque, and feedback mechanisms.</p>
+
+<!-- ANN Model Image -->
+<img src="ann_model_screenshot.jpg" alt="ANN Model Screenshot" width="600">
+
+<!-- PID Model Image -->
+<img src="pi_model_screenshot.jpg" alt="PID Model Screenshot" width="600">
+`,
+      
+
+      'V/F Control': `<ul><li>The V/F control method maintains a constant voltage-to-frequency ratio to keep the motor flux constant, ensuring steady torque across speed ranges.</li><li>A closed-loop system is used to enhance accuracy by feeding back the motor speed.</li><li>A Proportional-Integral (PI) controller compares the reference and actual speed to minimize error.</li><li>The PI output regulates the frequency and voltage fed into the motor via a PWM inverter.</li><li>This method provides simplified speed control suitable for many real-world applications without the complexity of vector control.</li><li>MATLAB/Simulink is used to design, simulate, and evaluate the effectiveness of the proposed control system.</li></ul>
+`,
+      'ANN Integration': `<ul><li>Artificial Neural Network (ANN) is introduced to enhance the adaptability of the V/F control system.</li><li>ANN is trained using input-output data from the motor.</li><li>A feedforward backpropagation network is created and trained in MATLAB Neural Network Toolbox.</li><li>The trained ANN model is exported and integrated into Simulink as a functional block.</li><li>ANN replaces traditional PI control by predicting optimal control actions based on learned behavior.</li><li>Helps in handling non-linearities, disturbances, or parameter variations more effectively.</li><li>Improves the system’s response time, accuracy, and robustness under varying load and speed conditions.</li><ul>`,
+      'Results': `<a href="ann_model_output.jpg" target="_blank">
+  <img src="ann_model_output.jpg" alt="ANN Model Output" style="max-width: 60%; margin: 10px; border-radius: 10px;">
+</a>
+
+<a href="pi_output.jpg" target="_blank">
+  <img src="pi_output.jpg" alt="PID Output" style="max-width: 60%; margin: 10px; border-radius: 10px;">
+</a>
+`,
+
+      'UI Design': `<ul><li>User Interface (UI) is the connection point between the user and a digital system, enabling interaction and control.</li><li>A good UI helps users easily understand, navigate, and operate system features without confusion.</li><li>In our project, the UI allows users to login, select subheadings, and explore ANN-based motor speed control details.</li><li>The design focuses on a clean, attractive, and user-friendly experience using HTML, CSS (Flexbox), and a handwritten Housky font for aesthetics.</li><ul><br><h1>Objectives of UI Design</h1><ul><li><b>Enhance Usability:</b> Ensure users can easily navigate, interact, and understand the system without requiring technical expertise.</li><li><b>Improve Visual Appeal:</b> Create an attractive layout with good color schemes, fonts (Housky), and clear structure for a pleasant experience.</li><li><b>Streamline Navigation:</b> Provide smooth transitions between login, subheadings, and content pages with minimal user effort.</li><li><b>Increase User Engagement:</b> Make the interface intuitive and engaging, encouraging users to interact more with the ANN-based motor control system.</li></ul>`,
+
+      'Conclusion': `<ul><li>The Volts-per-Hertz (V/F) control method offers a simple and reliable solution for the speed regulation of 3-phase induction motors.</li><li>Using a PI controller in a closed-loop system improves accuracy and dynamic response compared to open-loop control.</li><li>The integration of an Artificial Neural Network (ANN) enhances adaptability and performance by learning from system behavior.</li><li>Simulation results in MATLAB/Simulink show improved speed tracking, torque smoothness, and response under varying load conditions.</li><li>The proposed ANN-based V/F control approach proves to be cost-effective, intelligent, and efficient, making it suitable for real-world industrial applications.</li></ul>`,
+
+      'References':`<ol><li>H. M. D. Habbi, H. J. Ajeel, and I. I. Ali, “Speed Control of Induction Motor using PI and V/F Scalar Vector Controllers,” International Journal of Computer Applications, vol. 151, no. 7, pp. 36–43, Oct. 2016. [Online]. Available: https://doi.org/10.5120/ijca2016911831</li><li>R. Arulmozhiyal and K. Baskaran, “Implementation of a Fuzzy PI Controller for Speed Control of Induction Motor using FPGA,” IEEE Transactions on Industrial Electronics, vol. 56, no. 8, pp. 2475–2483, Aug. 2009. [Online]. Available: https://doi.org/10.1109/TIE.2008.2003205</li><li>Y. Wang, Z. Li, and X. Liu, “Speed Regulation of Induction Motor Using ANN-Based Control Strategy,” IEEE Transactions on Neural Networks and Learning Systems, vol. 27, no. 6, pp. 1293–1303, Jun. 2016. [Online]. Available: https://doi.org/10.1109/TNNLS.2015.2426672</li></ol>`
+    };
+
+    const description = contentMap[title];
+    document.getElementById('next-page').style.display = 'none';
+    document.getElementById('content').style.display = 'block';
+    document.getElementById('content-heading').innerText = title;
+
+    if (Array.isArray(description)) {
+      document.getElementById('content-description').innerHTML = `<ul>${description.map(item => `<li>${item}</li>`).join('')}</ul>`;
+    } else {
+      document.getElementById('content-description').innerHTML = `<p>${description.replace(/\n/g, '<br>')}</p>`;
+    }
+  }
+
+  function goBack() {
+    document.getElementById('content').style.display = 'none';
+    document.getElementById('next-page').style.display = 'flex';
+  }
+</script>
+</body>
+</html>
